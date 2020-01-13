@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grayBlue">
+
+    <TextView
+        android:id="@+id/waste_of_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:fontFamily="@font/nanumsquareroundeb"
+        android:paddingLeft="20dp"
+        android:text="이제 인생의 낭비를 줄여봅시다"
+        android:textColor="@color/white"
+        android:textSize="24dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/usage_track1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/nanumsquareroundeb"
+        android:paddingLeft="20dp"
+        android:text="1. 사용 시간 기록"
+        android:textColor="@color/white"
+        android:textSize="19dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/waste_of_time" />
+    <TextView
+        android:id="@+id/usage_track2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/nanumsquareround"
+        android:paddingLeft="20dp"
+        android:text="   지정한 어플의 사용 시간을 보여줍니다"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/usage_track1" />
+
+    <TextView
+        android:id="@+id/set_alarm1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/nanumsquareroundeb"
+        android:paddingLeft="20dp"
+        android:text="2. 알람 설정"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/usage_track2" />
+    <TextView
+        android:id="@+id/set_alarm2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/nanumsquareround"
+        android:paddingLeft="20dp"
+        android:text="   어플 실행 후 일정 시간이 지나면 \n   알려드립니다"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/set_alarm1" />
+
+    <TextView
+        android:id="@+id/set_cooltime1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/nanumsquareroundeb"
+        android:paddingLeft="20dp"
+        android:text="3. 쿨타임 설정"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/set_alarm2" />
+    <TextView
+        android:id="@+id/set_cooltime2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/nanumsquareround"
+        android:paddingLeft="20dp"
+        android:text="   알람이 울린 후 재실행까지 쿨타임이 \n   적용됩니다"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/set_cooltime1" />
+
+    <Button
+        android:id="@+id/get_started"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/grayBlue_btn"
+        android:fontFamily="@font/nanumsquareround"
+        android:text="  시작할까요?  "
+        android:textColor="@color/white"
+        android:textSize="22dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/set_cooltime2" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
