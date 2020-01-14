@@ -60,20 +60,19 @@ class GetForegroundService : Service() {
         // separate thread because the service normally runs in the process's
         // main thread, which we don't want to block.  We also make it
         // background priority so CPU-intensive work will not disrupt our UI.
+        createNotificationChannel()
+        val builder = NotificationCompat.Builder(applicationContext, getString(R.string.channel_id))
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(getString(R.string.app_name))
+            .setContentText("STOP PLAYING")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        startForeground(1, builder.build())
+
         HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND).apply {
             start()
-
             // Get the HandlerThread's Looper and use it for our Handler
             serviceLooper = looper
             serviceHandler = ServiceHandler(looper)
-
-            createNotificationChannel()
-            var builder = NotificationCompat.Builder(this@GetForegroundService, getString(R.string.channel_id))
-                //.setSmallIcon(R.drawable.notification_icon)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText("STOP PLAYING")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            startForeground(1, builder.build())
         }
     }
 

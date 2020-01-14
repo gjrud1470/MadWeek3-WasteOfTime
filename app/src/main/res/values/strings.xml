@@ -3,5 +3,6 @@
 
     <string name="channel_id">WasteOfTime</string>
     <string name="channel_name">WasteOfTime</string>
+    <string name="channel_name_high">WasteOfTimeUrgent</string>
     <string name="channel_description">DESCRIPTION</string>
 </resources>
