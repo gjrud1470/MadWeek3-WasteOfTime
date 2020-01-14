@@ -12,9 +12,9 @@ import androidx.core.app.NotificationManagerCompat
 import java.util.*
 
 
-class AlarmService : IntentService("AlarmService") {
+class ExtendAlarmService : IntentService("ExtendAlarmService") {
 
-    var mNotificationManager: NotificationManagerCompat? = null
+    var mNotificationManager : NotificationManagerCompat? = null
 
     override fun onHandleIntent(intent: Intent?) {
         try {
@@ -23,7 +23,7 @@ class AlarmService : IntentService("AlarmService") {
             // selected close application. Then go to home screen
             if (alarmtime == 0.toLong()) {
                 //appOptHolder.set_alarmtime(R.integer.default_alarm_time.toLong())
-                start_getforeground()
+                start_cooltime()
                 open_home()
             }
 
@@ -32,8 +32,7 @@ class AlarmService : IntentService("AlarmService") {
                 Thread.sleep(alarmtime)
                 val foreground_Name = getForegroundName()
                 if (foreground_Name != null && appOptHolder.get_blocked_apps() != null
-                    && foreground_Name in appOptHolder.get_blocked_apps()!!
-                ) {
+                    && foreground_Name in appOptHolder.get_blocked_apps()!!) {
                     if (appOptHolder.get_wakeup_opt() == 2) {
                         val builder = NotificationCompat.Builder(
                             applicationContext,
@@ -49,10 +48,12 @@ class AlarmService : IntentService("AlarmService") {
                             .build()
 
                         mNotificationManager?.notify(3, builder)
-                    } else if (appOptHolder.get_wakeup_opt() == 1) {
+                    }
+                    else if (appOptHolder.get_wakeup_opt() == 1) {
                         val wakeupintent = Intent(this, WakeupExtendActivity::class.java)
                         startActivity(wakeupintent)
-                    } else if (appOptHolder.get_wakeup_opt() == 0) {
+                    }
+                    else if (appOptHolder.get_wakeup_opt() == 0) {
                         val wakeupintent = Intent(this, WakeupCloseActivity::class.java)
                         startActivity(wakeupintent)
                     }
@@ -63,7 +64,7 @@ class AlarmService : IntentService("AlarmService") {
             else {
                 //appOptHolder.set_alarmtime(R.integer.default_alarm_time.toLong())
             }
-        } catch (e: InterruptedException) {
+        }catch (e : InterruptedException) {
             Thread.currentThread().interrupt()
         }
     }
@@ -82,7 +83,7 @@ class AlarmService : IntentService("AlarmService") {
         startForeground(2, builder.build())
     }
 
-    private fun getForegroundName(): String? {
+    private fun getForegroundName() : String? {
         return if (Build.VERSION.SDK_INT >= 21) {
             var currentApp: String? = null
             val usm =
@@ -117,10 +118,9 @@ class AlarmService : IntentService("AlarmService") {
             val name = getString(R.string.channel_name_high)
             val descriptionText = getString(R.string.channel_description)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel =
-                NotificationChannel(getString(R.string.channel_name_high), name, importance).apply {
-                    description = descriptionText
-                }
+            val channel = NotificationChannel(getString(R.string.channel_name_high), name, importance).apply {
+                description = descriptionText
+            }
             // Register the channel with the system
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -128,8 +128,8 @@ class AlarmService : IntentService("AlarmService") {
         }
     }
 
-    private fun start_getforeground() {
-        Intent(this, GetForegroundService::class.java).also { intent ->
+    private fun start_cooltime() {
+        Intent(this, CoolTimeService::class.java).also { intent ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(intent)
             }

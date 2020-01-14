@@ -6,11 +6,13 @@ import android.app.NotificationManager
 import android.app.Service
 import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.*
 import android.os.Build.VERSION
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import java.util.*
 import kotlin.concurrent.timerTask
@@ -22,6 +24,7 @@ class GetForegroundService : Service() {
 
     private var serviceLooper: Looper? = null
     private var serviceHandler: ServiceHandler? = null
+    //var timerTest = Timer()
 
     // Handler that receives messages from the thread
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
@@ -33,8 +36,13 @@ class GetForegroundService : Service() {
                 val timerTest = Timer()
 
                 timerTest.schedule(timerTask{
+                    if (!appOptHolder.get_monitoring_flag()) {
+                        Log.wtf(TAG, "monitor boolean is set to false")
+                        timerTest.cancel()
+                    }
+
                     val foreground_Name = getForegroundName()
-                    Log.wtf("TAG", "foreground name: ${foreground_Name}")
+                    Log.wtf(TAG, "foreground name: ${foreground_Name}")
                     if (foreground_Name != null && appOptHolder.get_blocked_apps() != null
                         && foreground_Name in appOptHolder.get_blocked_apps()!!) {
                         val alarmintent = Intent(this@GetForegroundService, SetAlarmActivity::class.java)
@@ -64,9 +72,10 @@ class GetForegroundService : Service() {
         val builder = NotificationCompat.Builder(applicationContext, getString(R.string.channel_id))
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(getString(R.string.app_name))
-            .setContentText("STOP PLAYING")
+            .setContentText("Monitoring App Usage...")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        startForeground(1, builder.build())
+            .build()
+        startForeground(1, builder)
 
         HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND).apply {
             start()
@@ -86,6 +95,8 @@ class GetForegroundService : Service() {
             }
         }
 
+        //timerTest = Timer()
+
         // If we get killed, after returning from here, restart
         return START_STICKY
     }
@@ -95,8 +106,16 @@ class GetForegroundService : Service() {
         return null
     }
 
+    /*
     override fun onDestroy() {
-    }
+        super.onDestroy()
+        timerTest.cancel()
+
+        val broadcastIntent = Intent()
+        broadcastIntent.action = "restartservice"
+        broadcastIntent.setClass(this, Restarter::class.java)
+        //this.sendBroadcast(broadcastIntent)
+    } */
 
     private fun getForegroundName() : String? {
         return if (VERSION.SDK_INT >= 21) {
@@ -116,13 +135,13 @@ class GetForegroundService : Service() {
                 }
             }
             //Log.e(TAG, "Current App in foreground is: $currentApp")
-            currentApp?.substring(currentApp.lastIndexOf('.')+1)
+            currentApp
         } else {
             val manager =
                 getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             val mm = manager.getRunningTasks(1)[0].topActivity!!.packageName
             //Log.e(TAG, "Current App in foreground is: $mm")
-            mm.substring(packageName.lastIndexOf('.')+1)
+            mm
         }
     }
 
@@ -142,4 +161,29 @@ class GetForegroundService : Service() {
             notificationManager.createNotificationChannel(channel)
         }
     }
+
+    private class ScreenReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            Log.i("Broadcast Listened", "Screen Toggled")
+            if(intent.getAction().equals(Intent.ACTION_SCREEN_ON)
+                && appOptHolder.get_monitoring_flag()){
+                Log.i("[BroadcastReceiver]", "Screen ON")
+            }
+            else if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
+                Log.i("[BroadcastReceiver]", "Screen OFF")
+            }
+        }
+    }
 }
+/*
+class Restarter : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.i("Broadcast Listened", "Service tried to stop")
+        Toast.makeText(context, "Service restarted", Toast.LENGTH_SHORT).show()
+        if (VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(Intent(context, GetForegroundService::class.java))
+        } else {
+            context.startService(Intent(context, GetForegroundService::class.java))
+        }
+    }
+} */

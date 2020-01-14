@@ -1,6 +1,8 @@
 package com.example.wasteoftime
 
 import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.graphics.drawable.Drawable
 import android.os.Bundle

@@ -1,6 +1,7 @@
 package com.example.wasteoftime
 
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -12,6 +13,8 @@ import kotlinx.android.synthetic.main.wakeup_extend.*
 import kotlinx.android.synthetic.main.wakeup_extend.submit_wakeup
 
 class WakeupExtendActivity : AppCompatActivity() {
+
+    var restart_flag = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +30,8 @@ class WakeupExtendActivity : AppCompatActivity() {
         submit_wakeup.setOnClickListener { view ->
             appOptHolder.set_alarmtime(temp_alarmtime)
 
-            Intent(this, AlarmService::class.java).also { intent ->
+            restart_flag = false
+            Intent(this, ExtendAlarmService::class.java).also { intent ->
                 startForegroundService(intent)
             }
             if (temp_alarmtime != 0.toLong())
@@ -73,6 +77,37 @@ class WakeupExtendActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        moveTaskToBack(true)
+        start_cooltime()
+        open_home()
+    }
+
+    override fun onStop() {
+        if (restart_flag)
+            start_cooltime()
+        super.onStop()
+    }
+
+    private fun start_getforeground() {
+        Intent(this, GetForegroundService::class.java).also { intent ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            }
+        }
+    }
+
+    private fun start_cooltime() {
+        Intent(this, CoolTimeService::class.java).also { intent ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            }
+        }
+    }
+
+    private fun open_home() {
+        restart_flag = false
+        val startHomescreen = Intent(Intent.ACTION_MAIN)
+        startHomescreen.addCategory(Intent.CATEGORY_HOME)
+        startHomescreen.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(startHomescreen)
     }
 }
