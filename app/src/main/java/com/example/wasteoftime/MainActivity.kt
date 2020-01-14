@@ -16,18 +16,21 @@ import android.os.Process.myUid
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
-
 class AppOptHolder {
-    private var blocked_apps : ArrayList<String>? = null
-    private var cooltime_bool : Boolean = true
+    private var blocked_apps : ArrayList<String> = ArrayList()
+    private var cooltime_bool : Boolean = true // default cooltime ON
     private var cooltime : Long = 0.toLong()   // default 30 min
     private var alarmtime : Long = 0.toLong()    // default 30 min
-    private var wakeup_option : Int = 1     // default: wakeup_extendable
+    private var monitoring_flag: Boolean = true //default 모니터링 ON, 쿨타임 및 알람 적용
+    private var wakeup_option: Int = 1 // default 연장 가능, 0: 바로 종료, 2: 알림만 띄우기
+    //shared preference 이용해서 setting 저장했다 불러오기
 
     fun get_blocked_apps () : ArrayList<String>? {
         return blocked_apps
@@ -61,6 +64,20 @@ class AppOptHolder {
         alarmtime = time
     }
 
+    fun get_monitoring_flag(): Boolean{
+        return get_monitoring_flag()
+    }
+
+    fun set_monitoring_flag(isChecked: Boolean){
+        monitoring_flag = isChecked
+    }
+  
+    fun printList() {
+        blocked_apps?.forEach {
+            Log.wtf("blocked", it)
+        }
+    }
+      
     fun get_wakeup_opt () : Int {
         return wakeup_option
     }
@@ -75,17 +92,13 @@ val appOptHolder = AppOptHolder()
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "WORK"
-    private val appUsageList = ArrayList<AppUsageItem>()
-    var mAdapter: AppUsageAdapter? = null
-    val mHandler = Handler()
+    private var appUsageList = ArrayList<AppUsageItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         setup_default_values()
-
-        appOptHolder.set_blocked_apps(arrayListOf("youtube"))
 
         if (!checkForPermission()) {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))    // permission settings
@@ -97,10 +110,16 @@ class MainActivity : AppCompatActivity() {
             }
             setAppUsageList(getAppUsageStats())
         }
-//        setting.setOnClickListener{
-//            setAppUsageList(getAppUsageStats())
-//        }
+        setting.setOnClickListener{
+            startActivity(Intent(this, SettingActivity::class.java))
+        }
     }
+
+    override fun onResume() {
+        setAppUsageList(getAppUsageStats())
+        super.onResume()
+    }
+
 
     private fun setup_default_values() {
         val pref = getSharedPreferences("UserData", Context.MODE_PRIVATE) as SharedPreferences
@@ -117,6 +136,7 @@ class MainActivity : AppCompatActivity() {
         val rcView = this.mRecyclerView
         val adapter = AppUsageAdapter(this, appUsageList)
         rcView.adapter = adapter
+        findViewById<ConstraintLayout>(R.id.activity_main).invalidate()
     }
 
     private fun checkForPermission(): Boolean {
@@ -139,13 +159,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAppUsageList(usageStats: MutableList<UsageStats>) {
+        appOptHolder.printList()
+
         if (usageStats.size == 0) {
             Log.wtf(TAG, "empty!")
         }
 
+        appUsageList = ArrayList<AppUsageItem>()
         usageStats.forEach { it ->
-            if (it.totalTimeInForeground > 10000) { //used more than a second
-                val name = getAppName(it.packageName)
+            if(appOptHolder.get_blocked_apps()?.contains(it.packageName)!!) { //used more than a second
+                Log.wtf("REACH", it.packageName.toString())
+                val name = it.packageName
                 val idx = appListIdx(name)
                 if (idx == -1) {
                     val item = AppUsageItem()
@@ -172,19 +196,6 @@ class MainActivity : AppCompatActivity() {
         })
         logAppList()
         setRecyclerView()
-    }
-
-    private fun getAppName(packageName: String): String{
-        val pm = applicationContext.packageManager
-        val ai: ApplicationInfo?
-        ai = try {
-            pm.getApplicationInfo(packageName, 0)
-        } catch (e: java.lang.Exception) {
-            null
-        }
-        val applicationName =
-            (if (ai != null) pm.getApplicationLabel(ai) else packageName.substring(packageName.lastIndexOf('.') + 1)) as String
-        return applicationName
     }
 
     private fun appListIdx(name: String): Int {
