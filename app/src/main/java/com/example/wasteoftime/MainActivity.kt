@@ -1,33 +1,22 @@
 package com.example.wasteoftime
 
-import android.app.Activity
 import android.app.AppOpsManager
 import android.app.AppOpsManager.MODE_ALLOWED
 import android.app.AppOpsManager.OPSTR_GET_USAGE_STATS
-import android.app.usage.UsageEvents
 import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.Handler
 import android.os.Process.myUid
 import android.provider.Settings
 import android.util.Log
-import android.widget.Adapter
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.inform_1.*
-import kotlinx.android.synthetic.main.inform_2.*
 import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
-import kotlin.concurrent.timerTask
 
 
 class AppOptHolder {

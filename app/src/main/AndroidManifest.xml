@@ -18,6 +18,12 @@
         <activity
             android:name=".SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
 
         <activity android:name=".WakeupActivity"
             android:noHistory="true"/>
@@ -30,22 +36,13 @@
         <service android:name=".GetForegroundService"
             android:stopWithTask="false"/>
 
-        <activity android:name=".MainActivity">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".InfoActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
 
-        <activity
-            android:name=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
