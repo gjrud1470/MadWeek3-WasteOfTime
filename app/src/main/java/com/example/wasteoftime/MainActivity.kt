@@ -37,6 +37,14 @@ class AppOptHolder {
         blocked_apps = list
     }
 
+    fun get_cooltime_bool () : Boolean {
+        return cooltime_bool
+    }
+
+    fun set_cooltime_bool (option: Boolean) {
+        cooltime_bool = option
+    }
+
     fun get_cooltime () : Long {
         return cooltime
     }
