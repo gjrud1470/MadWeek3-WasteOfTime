@@ -1,12 +1,16 @@
 package com.example.wasteoftime
 
 import android.Manifest
+import android.app.AppOpsManager
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Process
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -19,8 +23,20 @@ class SplashActivity: AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
 
+        if (!checkForPermission()) {
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))    // permission settings
+        }
+
         Log.d("WHY", "reached here!")
         startAct()
+    }
+
+    private fun checkForPermission(): Boolean {
+        val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val mode = appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            Process.myUid(), packageName)
+        return mode == AppOpsManager.MODE_ALLOWED
     }
 
     fun startAct(){

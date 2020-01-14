@@ -1,33 +1,24 @@
 package com.example.wasteoftime
 
-import android.app.Activity
 import android.app.AppOpsManager
 import android.app.AppOpsManager.MODE_ALLOWED
 import android.app.AppOpsManager.OPSTR_GET_USAGE_STATS
-import android.app.usage.UsageEvents
 import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
+import android.content.pm.ApplicationInfo
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Process.myUid
 import android.provider.Settings
 import android.util.Log
-import android.widget.Adapter
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.inform_1.*
-import kotlinx.android.synthetic.main.inform_2.*
 import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
-import kotlin.concurrent.timerTask
 
 
 class AppOptHolder {
@@ -78,32 +69,20 @@ class MainActivity : AppCompatActivity() {
 
         if (!checkForPermission()) {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))    // permission settings
-        }
-        else {
+        } else {
             Intent(this, GetForegroundService::class.java).also { intent ->
-                startForegroundService(intent)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(intent)
+                }
             }
+            setAppUsageList(getAppUsageStats())
         }
-
-        setRecyclerView()
-
-//        if (true) { //tutorial 끝날 때 isFirst를 true로 바꿔주기
-//            mHandler.post {
-//                setContentView(R.layout.inform_1)
-//                next_page.setOnClickListener {
-//                    setContentView(R.layout.inform_2)
-//                    get_started.setOnClickListener {
-//                        setContentView(R.layout.activity_main)
-//                        setUsageList()
-//                    }
-//                }
-//            }
-//        } else {
-//            setUsageList()
+//        setting.setOnClickListener{
+//            setAppUsageList(getAppUsageStats())
 //        }
     }
-    fun setRecyclerView(){
-        val rcView = mRecyclerView
+    private fun setRecyclerView(){
+        val rcView = this.mRecyclerView
         val adapter = AppUsageAdapter(this, appUsageList)
         rcView.adapter = adapter
     }
@@ -127,20 +106,14 @@ class MainActivity : AppCompatActivity() {
         return queryUsageStats
     }
 
-    private fun setAppUsageStats(usageStats: MutableList<UsageStats>) {
-        usageStats.sortWith(Comparator { left, right ->
-            compareValues(
-                left.packageName.substring(left.packageName.lastIndexOf('.') + 1),
-                right.packageName.substring(right.packageName.lastIndexOf('.') + 1)
-            )
-        })
+    private fun setAppUsageList(usageStats: MutableList<UsageStats>) {
         if (usageStats.size == 0) {
             Log.wtf(TAG, "empty!")
         }
 
         usageStats.forEach { it ->
             if (it.totalTimeInForeground > 10000) { //used more than a second
-                val name = it.packageName.substring(it.packageName.lastIndexOf('.') + 1)
+                val name = getAppName(it.packageName)
                 val idx = appListIdx(name)
                 if (idx == -1) {
                     val item = AppUsageItem()
@@ -148,6 +121,7 @@ class MainActivity : AppCompatActivity() {
                     try {
                         item.setIcon(pm.getApplicationIcon(it.packageName))
                         item.setName(name)
+
                         item.setUsageTime(it.totalTimeInForeground)
                         appUsageList.add(item) // if the app is already in the list?
                     } catch (e: Exception) {
@@ -161,6 +135,24 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        appUsageList.sortWith(Comparator { left, right ->
+            compareValues(right.getUsageTime(), left.getUsageTime())
+        })
+        logAppList()
+        setRecyclerView()
+    }
+
+    private fun getAppName(packageName: String): String{
+        val pm = applicationContext.packageManager
+        val ai: ApplicationInfo?
+        ai = try {
+            pm.getApplicationInfo(packageName, 0)
+        } catch (e: java.lang.Exception) {
+            null
+        }
+        val applicationName =
+            (if (ai != null) pm.getApplicationLabel(ai) else packageName.substring(packageName.lastIndexOf('.') + 1)) as String
+        return applicationName
     }
 
     private fun appListIdx(name: String): Int {
@@ -174,23 +166,6 @@ class MainActivity : AppCompatActivity() {
         }
         return -1
     }
-
-//    private fun getForegroundPackageName(): String? {
-//        var packageName: String? = null
-//        val usageStatsManager =
-//            getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-//        val endTime = System.currentTimeMillis()
-//        val beginTime = endTime - 10000
-//        val usageEvents = usageStatsManager.queryEvents(beginTime, endTime)
-//        while (usageEvents.hasNextEvent()) {
-//            val event = UsageEvents.Event()
-//            usageEvents.getNextEvent(event)
-//            if (event.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND) {
-//                packageName = event.packageName
-//            }
-//        }
-//        return packageName
-//    }
 
     private fun logAppList() {
         Log.wtf("PRINT", "LIST")

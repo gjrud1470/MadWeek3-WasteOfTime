@@ -1,9 +1,6 @@
 package com.example.wasteoftime
 
 import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
-import com.example.wasteoftime.R.drawable
-import com.example.wasteoftime.R.drawable.ic_launcher_foreground
 
 class AppUsageItem {
     private var icon: Drawable? = null
