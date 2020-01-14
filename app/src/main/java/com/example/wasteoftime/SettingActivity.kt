@@ -2,8 +2,6 @@ package com.example.wasteoftime
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.edittext.view.*
@@ -26,15 +24,15 @@ class SettingActivity: AppCompatActivity(){
             val builder = AlertDialog.Builder(this)
             builder.setMessage("알람 유형을 선택하세요") // 필요하면 유형별 설명 추가
                 .setPositiveButton("바로 종료하기") { _, _ ->
-                    appOptHolder.set_wakeup_option(1)
+                    appOptHolder.set_wakeup_opt(0)
                     current_alarm_type.text = "바로 종료하기"
                 }
                 .setNeutralButton("알람 연장하기") { _, _ ->
-                    appOptHolder.set_wakeup_option(2)
+                    appOptHolder.set_wakeup_opt(1)
                     current_alarm_type.text = "알람 연장하기"
                 }
                 .setNegativeButton("알림만 띄우기") { _, _ ->
-                    appOptHolder.set_wakeup_option(3)
+                    appOptHolder.set_wakeup_opt(2)
                     current_alarm_type.text = "알림만 띄우기"
                 }
             builder.show()

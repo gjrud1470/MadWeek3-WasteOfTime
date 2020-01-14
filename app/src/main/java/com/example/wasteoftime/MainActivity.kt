@@ -26,7 +26,7 @@ class AppOptHolder {
     private var cooltime : Long = R.integer.default_alarm_time.toLong()   // default 30 min
     private var alarmtime : Long = R.integer.default_alarm_time.toLong()    // default 30 min
     private var monitoring_flag: Boolean = true //default 모니터링 ON, 쿨타임 및 알람 적용
-    private var wakeup_option: Int = 2 // default 연장 가능, 1: 바로 종료, 3: 알림만 띄우기
+    private var wakeup_option: Int = 1 // default 연장 가능, 0: 바로 종료, 2: 알림만 띄우기
     //shared preference 이용해서 setting 저장했다 불러오기
 
     fun get_blocked_apps () : ArrayList<String>? {
@@ -69,10 +69,7 @@ class AppOptHolder {
         monitoring_flag = isChecked
     }
 
-    fun get_wakeup_option(): Int{
-        return wakeup_option
-    }
-    fun set_wakeup_option(option: Int){
+    fun set_wakeup_opt(option: Int){
         wakeup_option = option
     }
     fun printList(){
@@ -139,7 +136,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         usageStats.forEach { it ->
-            if (it.totalTimeInForeground > 10000) { //used more than a second
+            if (appOptHolder.get_blocked_apps()?.contains(it.packageName)!!) { //used more than a second
                 val name = it.packageName
                 val idx = appListIdx(name)
                 if (idx == -1) {
@@ -168,8 +165,6 @@ class MainActivity : AppCompatActivity() {
         logAppList()
         setRecyclerView()
     }
-
-
 
     private fun appListIdx(name: String): Int {
         if (!appUsageList.isEmpty()) {
