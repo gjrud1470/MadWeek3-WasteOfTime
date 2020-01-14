@@ -32,7 +32,7 @@ class AppUsageAdapter(val context: Context, val appUsageList: ArrayList<AppUsage
             if (usageItem.getName() != null) {
                 appName?.text = usageItem.getName()
             }
-            usageTime.text = usageItem.getUsageTime().toString()
+            usageTime.text = (usageItem.getUsageTime()/60000).toString().plus("분")
             if(usageItem.getIcon() != null){
                 appIcon.setImageDrawable(usageItem.getIcon())
             }
