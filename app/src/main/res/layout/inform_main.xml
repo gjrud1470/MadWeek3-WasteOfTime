@@ -42,6 +42,8 @@
         android:background="@drawable/rounded_background"
         android:backgroundTint="@color/grayBlue_btn"
         android:layout_marginTop="15dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:text="시작하기"
         android:fontFamily="@font/nanumpen"
         android:textSize="35dp"
