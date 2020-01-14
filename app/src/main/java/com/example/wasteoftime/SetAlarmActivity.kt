@@ -1,6 +1,7 @@
 package com.example.wasteoftime
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -11,6 +12,8 @@ import kotlinx.android.synthetic.main.activity_set_alarm.*
 
 
 class SetAlarmActivity : AppCompatActivity() {
+
+    var restart_flag = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +29,7 @@ class SetAlarmActivity : AppCompatActivity() {
         submit.setOnClickListener { view ->
             appOptHolder.set_alarmtime(temp_alarmtime)
 
+            restart_flag = false
             Intent(this, AlarmService::class.java).also { intent ->
                 startForegroundService(intent)
             }
@@ -58,7 +62,10 @@ class SetAlarmActivity : AppCompatActivity() {
                 //아이템이 클릭 되면 맨 위부터 position 0번부터 순서대로 동작하게 됩니다.
                 when (position) {
                     0 -> temp_alarmtime = 0                 // finish app now
-                    7 -> temp_alarmtime = -1     // Play indefinitely
+                    7 -> {
+                        appOptHolder.set_monitoring_flag(false)
+                        temp_alarmtime = -1
+                    }     // Play indefinitely
                     else -> {
                         temp_alarmtime = position * resources.getInteger(R.integer.min_unit).toLong()  // position * 10 min
                     }
@@ -72,6 +79,28 @@ class SetAlarmActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        moveTaskToBack(true)
+        start_getforeground()
+        open_home()
+    }
+
+    override fun onStop() {
+        if (restart_flag)
+            start_getforeground()
+        super.onStop()
+    }
+
+    private fun start_getforeground() {
+        Intent(this, GetForegroundService::class.java).also { intent ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            }
+        }
+    }
+
+    private fun open_home() {
+        val startHomescreen = Intent(Intent.ACTION_MAIN)
+        startHomescreen.addCategory(Intent.CATEGORY_HOME)
+        startHomescreen.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(startHomescreen)
     }
 }

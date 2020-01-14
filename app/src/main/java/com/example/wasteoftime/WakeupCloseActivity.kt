@@ -1,6 +1,7 @@
 package com.example.wasteoftime
 
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -13,6 +14,8 @@ import kotlinx.android.synthetic.main.wakeup_extend.submit_wakeup
 
 class WakeupCloseActivity : AppCompatActivity() {
 
+    var restart_flag = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.wakeup_close)
@@ -22,14 +25,40 @@ class WakeupCloseActivity : AppCompatActivity() {
 
     private fun init_activity_close() {
         submit_close.setOnClickListener { view ->
-            val startHomescreen = Intent(Intent.ACTION_MAIN)
-            startHomescreen.addCategory(Intent.CATEGORY_HOME)
-            startHomescreen.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(startHomescreen)
+            start_cooltime()
+            open_home()
         }
     }
 
     override fun onBackPressed() {
+        start_cooltime()
+        open_home()
+    }
+
+    override fun onStop() {
+        if (restart_flag)
+            start_cooltime()
+        super.onStop()
+    }
+
+    private fun start_cooltime() {
+        Intent(this, CoolTimeService::class.java).also { intent ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            }
+        }
+    }
+
+    private fun start_getforeground() {
+        Intent(this, GetForegroundService::class.java).also { intent ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+            }
+        }
+    }
+
+    private fun open_home() {
+        restart_flag = false
         val startHomescreen = Intent(Intent.ACTION_MAIN)
         startHomescreen.addCategory(Intent.CATEGORY_HOME)
         startHomescreen.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK

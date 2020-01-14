@@ -20,6 +20,7 @@ class CoolTimeActivity : AppCompatActivity() {
             startHomescreen.addCategory(Intent.CATEGORY_HOME)
             startHomescreen.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(startHomescreen)
+            finish()
         }
     }
 
@@ -28,5 +29,6 @@ class CoolTimeActivity : AppCompatActivity() {
         startHomescreen.addCategory(Intent.CATEGORY_HOME)
         startHomescreen.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(startHomescreen)
+        finish()
     }
 }
