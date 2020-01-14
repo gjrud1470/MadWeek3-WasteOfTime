@@ -25,9 +25,9 @@ class AppOptHolder {
     private var blocked_apps : ArrayList<String> = ArrayList()
     private var cooltime_bool : Boolean = true // default cooltime ON
     private var cooltime : Long = 0.toLong()   // default 30 min
-    private var alarmtime : Long = 0.toLong())    // default 30 min
+    private var alarmtime : Long = 0.toLong()    // default 30 min
     private var monitoring_flag: Boolean = true //default 모니터링 ON, 쿨타임 및 알람 적용
-    private var wakeup_option: Int = 2 // default 연장 가능, 1: 바로 종료, 3: 알림만 띄우기
+    private var wakeup_option: Int = 1 // default 연장 가능, 0: 바로 종료, 2: 알림만 띄우기
     //shared preference 이용해서 setting 저장했다 불러오기
 
     fun get_blocked_apps () : ArrayList<String>? {
@@ -69,19 +69,12 @@ class AppOptHolder {
     fun set_monitoring_flag(isChecked: Boolean){
         monitoring_flag = isChecked
     }
-
-    fun get_wakeup_option(): Int{
-        return wakeup_option
-    }
   
-    fun set_wakeup_option(option: Int){
-        wakeup_option = option
-    }
-  
-    fun printList(){
+    fun printList() {
         blocked_apps?.forEach {
             Log.wtf("blocked", it)
         }
+    }
       
     fun get_wakeup_opt () : Int {
         return wakeup_option
