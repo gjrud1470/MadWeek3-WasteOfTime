@@ -9,6 +9,8 @@ import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.Handler
 import android.os.Process.myUid
@@ -23,9 +25,43 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.inform_1.*
 import kotlinx.android.synthetic.main.inform_2.*
 import java.util.*
+import kotlin.Comparator
 import kotlin.collections.ArrayList
 import kotlin.concurrent.timerTask
 
+
+class AppOptHolder {
+    private var blocked_apps : ArrayList<String>? = null
+    private var cooltime_bool : Boolean = true
+    private var cooltime : Long = R.integer.default_alarm_time.toLong()   // default 30 min
+    private var alarmtime : Long = R.integer.default_alarm_time.toLong()    // default 30 min
+
+    fun get_blocked_apps () : ArrayList<String>? {
+        return blocked_apps
+    }
+
+    fun set_blocked_apps (list : ArrayList<String>) {
+        blocked_apps = list
+    }
+
+    fun get_cooltime () : Long {
+        return cooltime
+    }
+
+    fun set_cooltime (time : Long) {
+        cooltime = time
+    }
+
+    fun get_alarmtime () : Long {
+        return alarmtime
+    }
+
+    fun set_alarmtime (time : Long) {
+        alarmtime = time
+    }
+}
+
+val appOptHolder = AppOptHolder()
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,28 +74,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val timerTest = Timer()
-        timerTest.schedule(timerTask {
-            setAppUsageStats(getAppUsageStats())
-            logAppList()
-        }, 0, 30000) // 30sec
-        //problem: app currently in foreground -> totalTimeInForeground not updated! -> steal foreground to check?
+        appOptHolder.set_blocked_apps(arrayListOf("youtube"))
 
-        setting.setOnClickListener {
-            if (!checkForPermission()) {
-                Log.i(TAG, "The user may not allow the access to apps usage. ")
-                Toast.makeText(
-                    this,
-                    "Failed to retrieve app usage statistics. You may need to enable access for this app through Settings > Security > Apps with usage access",
-                    Toast.LENGTH_LONG
-                ).show()
-                startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-            } else {
-                Log.wtf(TAG, "clicked")
-                setAppUsageStats(getAppUsageStats()) // keeps running on background -> no need to save
-            }
-            //logAppList()
+        if (!checkForPermission()) {
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))    // permission settings
         }
+        else {
+            Intent(this, GetForegroundService::class.java).also { intent ->
+                startForegroundService(intent)
+            }
+        }
+
         setRecyclerView()
 
 //        if (true) { //tutorial 끝날 때 isFirst를 true로 바꿔주기
