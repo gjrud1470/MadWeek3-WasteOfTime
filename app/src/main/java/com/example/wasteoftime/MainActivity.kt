@@ -8,6 +8,8 @@ import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.os.Process.myUid
 import android.provider.Settings
@@ -16,9 +18,43 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import kotlin.Comparator
 import kotlin.collections.ArrayList
 import kotlin.concurrent.timerTask
 
+
+class AppOptHolder {
+    private var blocked_apps : ArrayList<String>? = null
+    private var cooltime_bool : Boolean = true
+    private var cooltime : Long = R.integer.default_alarm_time.toLong()   // default 30 min
+    private var alarmtime : Long = R.integer.default_alarm_time.toLong()    // default 30 min
+
+    fun get_blocked_apps () : ArrayList<String>? {
+        return blocked_apps
+    }
+
+    fun set_blocked_apps (list : ArrayList<String>) {
+        blocked_apps = list
+    }
+
+    fun get_cooltime () : Long {
+        return cooltime
+    }
+
+    fun set_cooltime (time : Long) {
+        cooltime = time
+    }
+
+    fun get_alarmtime () : Long {
+        return alarmtime
+    }
+
+    fun set_alarmtime (time : Long) {
+        alarmtime = time
+    }
+}
+
+val appOptHolder = AppOptHolder()
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,13 +65,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        appOptHolder.set_blocked_apps(arrayListOf("youtube"))
+
+        if (!checkForPermission()) {
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))    // permission settings
+        }
+        Intent(this, GetForegroundService::class.java).also { intent ->
+            startForegroundService(intent)
+        }
+
         val timerTest = Timer()
+
+        /*
         timerTest.schedule(timerTask{
             setAppUsageStats(getAppUsageStats())
             logAppList()
         }, 0,30000) // 30sec
         //problem: app currently in foreground -> totalTimeInForeground not updated! -> steal foreground to check?
-
+        */
 
         button.setOnClickListener{
             if (!checkForPermission()) {
