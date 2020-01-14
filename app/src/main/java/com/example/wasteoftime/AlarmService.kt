@@ -1,15 +1,20 @@
 package com.example.wasteoftime
 
-import android.app.IntentService
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.*
+import android.app.usage.UsageStats
+import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import java.util.*
 
 
 class AlarmService : IntentService("AlarmService") {
+
+    var mNotificationManager : NotificationManagerCompat? = null
 
     override fun onHandleIntent(intent: Intent?) {
         try {
@@ -27,10 +32,34 @@ class AlarmService : IntentService("AlarmService") {
             // selected alarm function. Set alarm x min later then prompt.
             else if (alarmtime > 0.toLong()) {
                 Thread.sleep(alarmtime)
-                val wakeupintent = Intent(this, WakeupActivity::class.java)
-                startActivity(wakeupintent)
+                val foreground_Name = getForegroundName()
+                if (foreground_Name != null && appOptHolder.get_blocked_apps() != null
+                    && foreground_Name in appOptHolder.get_blocked_apps()!!) {
+                    if (appOptHolder.get_wakeup_opt() == 2) {
+                        val builder = NotificationCompat.Builder(
+                            applicationContext,
+                            getString(R.string.channel_name_high)
+                        )
+                            .setSmallIcon(R.drawable.arrow_right)
+                            .setContentTitle("Waste of Time")
+                            .setContentText("Time to stop Playing!")
+                            .setDefaults(Notification.DEFAULT_VIBRATE)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setAutoCancel(true)
+                            .setTicker("Time to stop Playing!")
+                            .build()
 
-                // add here if we want to allow extend time.
+                        mNotificationManager?.notify(3, builder)
+                    }
+                    else if (appOptHolder.get_wakeup_opt() == 1) {
+                        val wakeupintent = Intent(this, WakeupExtendActivity::class.java)
+                        startActivity(wakeupintent)
+                    }
+                    else if (appOptHolder.get_wakeup_opt() == 0) {
+                        val wakeupintent = Intent(this, WakeupCloseActivity::class.java)
+                        startActivity(wakeupintent)
+                    }
+                }
             }
 
             // selected no alarm function. Finish Service without doing anything.
@@ -46,22 +75,52 @@ class AlarmService : IntentService("AlarmService") {
         super.onCreate()
 
         createNotificationChannel()
-        var builder = NotificationCompat.Builder(this, getString(R.string.channel_id))
+        mNotificationManager = NotificationManagerCompat.from(this)
+
+        val builder = NotificationCompat.Builder(this, getString(R.string.channel_id))
             //.setSmallIcon(R.drawable.notification_icon)
             .setContentTitle(getString(R.string.app_name))
             .setContentText("STOP PLAYING")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        startForeground(1, builder.build())
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+        startForeground(2, builder.build())
+    }
+
+    private fun getForegroundName() : String? {
+        return if (Build.VERSION.SDK_INT >= 21) {
+            var currentApp: String? = null
+            val usm =
+                this.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+            val time = System.currentTimeMillis()
+            val applist =
+                usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 1000, time)
+            if (applist != null && applist.size > 0) {
+                val mySortedMap: SortedMap<Long, UsageStats> = TreeMap()
+                for (usageStats in applist) {
+                    mySortedMap[usageStats.lastTimeUsed] = usageStats
+                }
+                if (mySortedMap != null && !mySortedMap.isEmpty()) {
+                    currentApp = mySortedMap[mySortedMap.lastKey()]!!.packageName
+                }
+            }
+            //Log.e(TAG, "Current App in foreground is: $currentApp")
+            currentApp?.substring(currentApp.lastIndexOf('.')+1)
+        } else {
+            val manager =
+                getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val mm = manager.getRunningTasks(1)[0].topActivity!!.packageName
+            //Log.e(TAG, "Current App in foreground is: $mm")
+            mm.substring(packageName.lastIndexOf('.')+1)
+        }
     }
 
     private fun createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.channel_name)
+            val name = getString(R.string.channel_name_high)
             val descriptionText = getString(R.string.channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(getString(R.string.channel_id), name, importance).apply {
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(getString(R.string.channel_name_high), name, importance).apply {
                 description = descriptionText
             }
             // Register the channel with the system

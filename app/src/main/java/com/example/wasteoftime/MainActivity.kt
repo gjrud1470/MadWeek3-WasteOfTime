@@ -7,6 +7,7 @@ import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.os.Bundle
@@ -21,10 +22,10 @@ import kotlin.Comparator
 import kotlin.collections.ArrayList
 
 class AppOptHolder {
-    private var blocked_apps : ArrayList<String>? = ArrayList()
+    private var blocked_apps : ArrayList<String> = ArrayList()
     private var cooltime_bool : Boolean = true // default cooltime ON
-    private var cooltime : Long = R.integer.default_alarm_time.toLong()   // default 30 min
-    private var alarmtime : Long = R.integer.default_alarm_time.toLong()    // default 30 min
+    private var cooltime : Long = 0.toLong()   // default 30 min
+    private var alarmtime : Long = 0.toLong())    // default 30 min
     private var monitoring_flag: Boolean = true //default 모니터링 ON, 쿨타임 및 알람 적용
     private var wakeup_option: Int = 2 // default 연장 가능, 1: 바로 종료, 3: 알림만 띄우기
     //shared preference 이용해서 setting 저장했다 불러오기
@@ -72,13 +73,22 @@ class AppOptHolder {
     fun get_wakeup_option(): Int{
         return wakeup_option
     }
+  
     fun set_wakeup_option(option: Int){
         wakeup_option = option
     }
+  
     fun printList(){
         blocked_apps?.forEach {
             Log.wtf("blocked", it)
         }
+      
+    fun get_wakeup_opt () : Int {
+        return wakeup_option
+    }
+
+    fun set_wakeup_opt (opt : Int) {
+        wakeup_option = opt
     }
 }
 
@@ -93,6 +103,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setup_default_values()
+
         if (!checkForPermission()) {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))    // permission settings
         } else {
@@ -106,6 +118,18 @@ class MainActivity : AppCompatActivity() {
         setting.setOnClickListener{
             startActivity(Intent(this, SettingActivity::class.java))
         }
+    }
+
+
+    private fun setup_default_values() {
+        val pref = getSharedPreferences("UserData", Context.MODE_PRIVATE) as SharedPreferences
+        appOptHolder.set_alarmtime(pref.getLong("alarmtime",
+            resources.getInteger(R.integer.default_alarm_time).toLong()
+                * resources.getInteger(R.integer.min_unit)))    // default 30 min
+        appOptHolder.set_cooltime(pref.getLong("cooltime",
+            resources.getInteger(R.integer.default_alarm_time).toLong()
+                * resources.getInteger(R.integer.min_unit)))    // default 30 min
+        appOptHolder.set_wakeup_opt(pref.getInt("wakeup_opt", 1))
     }
 
     private fun setRecyclerView(){
