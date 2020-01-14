@@ -21,7 +21,7 @@ import kotlin.Comparator
 import kotlin.collections.ArrayList
 
 class AppOptHolder {
-    private var blocked_apps : ArrayList<String>? = null
+    private var blocked_apps : ArrayList<String>? = ArrayList()
     private var cooltime_bool : Boolean = true // default cooltime ON
     private var cooltime : Long = R.integer.default_alarm_time.toLong()   // default 30 min
     private var alarmtime : Long = R.integer.default_alarm_time.toLong()    // default 30 min
@@ -75,6 +75,11 @@ class AppOptHolder {
     fun set_wakeup_option(option: Int){
         wakeup_option = option
     }
+    fun printList(){
+        blocked_apps?.forEach {
+            Log.wtf("blocked", it)
+        }
+    }
 }
 
 val appOptHolder = AppOptHolder()
@@ -83,14 +88,10 @@ class MainActivity : AppCompatActivity() {
 
     private val TAG = "WORK"
     private val appUsageList = ArrayList<AppUsageItem>()
-    var mAdapter: AppUsageAdapter? = null
-    val mHandler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        appOptHolder.set_blocked_apps(arrayListOf("youtube"))
 
         if (!checkForPermission()) {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))    // permission settings
@@ -139,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
         usageStats.forEach { it ->
             if (it.totalTimeInForeground > 10000) { //used more than a second
-                val name = getAppName(it.packageName)
+                val name = it.packageName
                 val idx = appListIdx(name)
                 if (idx == -1) {
                     val item = AppUsageItem()
@@ -168,18 +169,7 @@ class MainActivity : AppCompatActivity() {
         setRecyclerView()
     }
 
-    private fun getAppName(packageName: String): String{
-        val pm = applicationContext.packageManager
-        val ai: ApplicationInfo?
-        ai = try {
-            pm.getApplicationInfo(packageName, 0)
-        } catch (e: java.lang.Exception) {
-            null
-        }
-        val applicationName =
-            (if (ai != null) pm.getApplicationLabel(ai) else packageName.substring(packageName.lastIndexOf('.') + 1)) as String
-        return applicationName
-    }
+
 
     private fun appListIdx(name: String): Int {
         if (!appUsageList.isEmpty()) {

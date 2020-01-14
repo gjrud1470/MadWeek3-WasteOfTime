@@ -52,6 +52,7 @@
         <activity
             android:name=".SettingActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".AppSelectActivity"
             android:theme="@style/AppTheme.NoActionBar" />
