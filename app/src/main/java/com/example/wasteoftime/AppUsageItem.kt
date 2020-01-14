@@ -1,11 +1,14 @@
 package com.example.wasteoftime
 
 import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
+import com.example.wasteoftime.R.drawable
+import com.example.wasteoftime.R.drawable.ic_launcher_foreground
 
 class AppUsageItem {
     private var icon: Drawable? = null
     private var name: String? = null
-    private var usageTimeList: ArrayList<Long>? = null
+    private var usageTime: Long = 0
 
     fun getIcon(): Drawable? {
         return icon
@@ -21,13 +24,10 @@ class AppUsageItem {
         this.name = name
     }
 
-    fun getUsageTimeList(): ArrayList<Long>? {
-        return usageTimeList
+    fun getUsageTime(): Long {
+        return usageTime
     }
-    fun addUsageTimeToday(usageTimeToday: Long){
-        if(usageTimeList == null){
-            usageTimeList = ArrayList()
-        }
-        usageTimeList?.add(usageTimeToday)
+    fun setUsageTime(usageTimeToday: Long){
+        usageTime = usageTimeToday
     }
 }
