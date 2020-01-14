@@ -20,7 +20,6 @@ import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
-
 class AppOptHolder {
     private var blocked_apps : ArrayList<String>? = null
     private var cooltime_bool : Boolean = true // default cooltime ON
