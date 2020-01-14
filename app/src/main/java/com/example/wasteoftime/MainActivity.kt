@@ -16,6 +16,8 @@ import android.os.Process.myUid
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.Comparator
@@ -90,7 +92,7 @@ val appOptHolder = AppOptHolder()
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "WORK"
-    private val appUsageList = ArrayList<AppUsageItem>()
+    private var appUsageList = ArrayList<AppUsageItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,6 +115,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        setAppUsageList(getAppUsageStats())
+        super.onResume()
+    }
+
 
     private fun setup_default_values() {
         val pref = getSharedPreferences("UserData", Context.MODE_PRIVATE) as SharedPreferences
@@ -129,6 +136,7 @@ class MainActivity : AppCompatActivity() {
         val rcView = this.mRecyclerView
         val adapter = AppUsageAdapter(this, appUsageList)
         rcView.adapter = adapter
+        findViewById<ConstraintLayout>(R.id.activity_main).invalidate()
     }
 
     private fun checkForPermission(): Boolean {
@@ -151,12 +159,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAppUsageList(usageStats: MutableList<UsageStats>) {
+        appOptHolder.printList()
+
         if (usageStats.size == 0) {
             Log.wtf(TAG, "empty!")
         }
 
+        appUsageList = ArrayList<AppUsageItem>()
         usageStats.forEach { it ->
-            if (it.totalTimeInForeground > 10000) { //used more than a second
+            if(appOptHolder.get_blocked_apps()?.contains(it.packageName)!!) { //used more than a second
+                Log.wtf("REACH", it.packageName.toString())
                 val name = it.packageName
                 val idx = appListIdx(name)
                 if (idx == -1) {
@@ -185,8 +197,6 @@ class MainActivity : AppCompatActivity() {
         logAppList()
         setRecyclerView()
     }
-
-
 
     private fun appListIdx(name: String): Int {
         if (!appUsageList.isEmpty()) {
