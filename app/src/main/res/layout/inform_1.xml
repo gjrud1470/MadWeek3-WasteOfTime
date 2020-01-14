@@ -5,27 +5,13 @@
     android:layout_height="match_parent"
     android:background="@color/grayBlue">
 
-    <TextView
-        android:id="@+id/starting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:layout_marginTop="20dp"
-        android:paddingLeft="20dp"
-        android:text="시작하기"
-        android:fontFamily="@font/nanumgothic"
-        android:textSize="18dp"
-        android:textColor="@color/white"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ImageView
         android:id="@+id/bed_phone"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:padding="25dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/starting"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/sleep_phone" />
 
     <TextView
@@ -65,22 +51,6 @@
         android:textSize="19dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/your_life" />
-
-    <Button
-        android:id="@+id/next_page"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="83dp"
-        android:layout_height="45dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/grayBlue_btn"
-        android:fontFamily="@font/nanumgothic"
-        android:text="NEXT"
-        android:textColor="@color/white"
-        android:textSize="18dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/no_sleep"
-        app:layout_constraintVertical_bias="0.25" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

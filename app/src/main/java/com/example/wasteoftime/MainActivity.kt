@@ -20,8 +20,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.inform_first.*
-import kotlinx.android.synthetic.main.inform_second.*
+import kotlinx.android.synthetic.main.inform_1.*
+import kotlinx.android.synthetic.main.inform_2.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.timerTask
@@ -38,37 +38,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (true) { //tutorial 끝날 때 isFirst를 true로 바꿔주기
-            mHandler.post {
-                setContentView(R.layout.inform_first)
-                next_page.setOnClickListener {
-                    //TODO("오른쪽으로 넘기는 animation")
-                    setContentView(R.layout.inform_second)
-                    get_started.setOnClickListener {
-                        //TODO("오른쪽으로 넘기는 animation")
-                        setContentView(R.layout.activity_main)
-                        setUsageList()
-                    }
-                }
-            }
-        } else {
-            setUsageList()
-        }
-    }
-    fun setRecyclerView(){
-        val rcView = mRecyclerView
-        val adapter = AppUsageAdapter(this, appUsageList)
-        rcView.adapter = adapter
-    }
-
-    fun setUsageList() {
         val timerTest = Timer()
         timerTest.schedule(timerTask {
             setAppUsageStats(getAppUsageStats())
             logAppList()
         }, 0, 30000) // 30sec
         //problem: app currently in foreground -> totalTimeInForeground not updated! -> steal foreground to check?
-
 
         setting.setOnClickListener {
             if (!checkForPermission()) {
@@ -86,17 +61,26 @@ class MainActivity : AppCompatActivity() {
             //logAppList()
         }
         setRecyclerView()
-    }
 
-    fun checkAppFirstExecute(): Boolean {
-        val pref = getSharedPreferences("IsFirst", Activity.MODE_PRIVATE);
-        val isFirst = pref.getBoolean("isFirst", false);
-        if (!isFirst) { //최초 실행시 true 저장
-            val editor = pref.edit();
-            editor.putBoolean("isFirst", true);
-            editor.commit();
-        }
-        return !isFirst;
+//        if (true) { //tutorial 끝날 때 isFirst를 true로 바꿔주기
+//            mHandler.post {
+//                setContentView(R.layout.inform_1)
+//                next_page.setOnClickListener {
+//                    setContentView(R.layout.inform_2)
+//                    get_started.setOnClickListener {
+//                        setContentView(R.layout.activity_main)
+//                        setUsageList()
+//                    }
+//                }
+//            }
+//        } else {
+//            setUsageList()
+//        }
+    }
+    fun setRecyclerView(){
+        val rcView = mRecyclerView
+        val adapter = AppUsageAdapter(this, appUsageList)
+        rcView.adapter = adapter
     }
 
     private fun checkForPermission(): Boolean {
