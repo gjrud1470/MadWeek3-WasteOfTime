@@ -21,13 +21,14 @@ import java.util.*
 import kotlin.Comparator
 import kotlin.collections.ArrayList
 
-
 class AppOptHolder {
-    private var blocked_apps : ArrayList<String>? = null
-    private var cooltime_bool : Boolean = true
+    private var blocked_apps : ArrayList<String> = ArrayList()
+    private var cooltime_bool : Boolean = true // default cooltime ON
     private var cooltime : Long = 0.toLong()   // default 30 min
-    private var alarmtime : Long = 0.toLong()    // default 30 min
-    private var wakeup_option : Int = 1     // default: wakeup_extendable
+    private var alarmtime : Long = 0.toLong())    // default 30 min
+    private var monitoring_flag: Boolean = true //default 모니터링 ON, 쿨타임 및 알람 적용
+    private var wakeup_option: Int = 2 // default 연장 가능, 1: 바로 종료, 3: 알림만 띄우기
+    //shared preference 이용해서 setting 저장했다 불러오기
 
     fun get_blocked_apps () : ArrayList<String>? {
         return blocked_apps
@@ -35,6 +36,14 @@ class AppOptHolder {
 
     fun set_blocked_apps (list : ArrayList<String>) {
         blocked_apps = list
+    }
+
+    fun get_cooltime_bool () : Boolean {
+        return cooltime_bool
+    }
+
+    fun set_cooltime_bool (option: Boolean) {
+        cooltime_bool = option
     }
 
     fun get_cooltime () : Long {
@@ -53,6 +62,27 @@ class AppOptHolder {
         alarmtime = time
     }
 
+    fun get_monitoring_flag(): Boolean{
+        return get_monitoring_flag()
+    }
+
+    fun set_monitoring_flag(isChecked: Boolean){
+        monitoring_flag = isChecked
+    }
+
+    fun get_wakeup_option(): Int{
+        return wakeup_option
+    }
+  
+    fun set_wakeup_option(option: Int){
+        wakeup_option = option
+    }
+  
+    fun printList(){
+        blocked_apps?.forEach {
+            Log.wtf("blocked", it)
+        }
+      
     fun get_wakeup_opt () : Int {
         return wakeup_option
     }
@@ -68,16 +98,12 @@ class MainActivity : AppCompatActivity() {
 
     private val TAG = "WORK"
     private val appUsageList = ArrayList<AppUsageItem>()
-    var mAdapter: AppUsageAdapter? = null
-    val mHandler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         setup_default_values()
-
-        appOptHolder.set_blocked_apps(arrayListOf("youtube"))
 
         if (!checkForPermission()) {
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))    // permission settings
@@ -89,10 +115,11 @@ class MainActivity : AppCompatActivity() {
             }
             setAppUsageList(getAppUsageStats())
         }
-//        setting.setOnClickListener{
-//            setAppUsageList(getAppUsageStats())
-//        }
+        setting.setOnClickListener{
+            startActivity(Intent(this, SettingActivity::class.java))
+        }
     }
+
 
     private fun setup_default_values() {
         val pref = getSharedPreferences("UserData", Context.MODE_PRIVATE) as SharedPreferences
@@ -137,7 +164,7 @@ class MainActivity : AppCompatActivity() {
 
         usageStats.forEach { it ->
             if (it.totalTimeInForeground > 10000) { //used more than a second
-                val name = getAppName(it.packageName)
+                val name = it.packageName
                 val idx = appListIdx(name)
                 if (idx == -1) {
                     val item = AppUsageItem()
@@ -166,18 +193,7 @@ class MainActivity : AppCompatActivity() {
         setRecyclerView()
     }
 
-    private fun getAppName(packageName: String): String{
-        val pm = applicationContext.packageManager
-        val ai: ApplicationInfo?
-        ai = try {
-            pm.getApplicationInfo(packageName, 0)
-        } catch (e: java.lang.Exception) {
-            null
-        }
-        val applicationName =
-            (if (ai != null) pm.getApplicationLabel(ai) else packageName.substring(packageName.lastIndexOf('.') + 1)) as String
-        return applicationName
-    }
+
 
     private fun appListIdx(name: String): Int {
         if (!appUsageList.isEmpty()) {
