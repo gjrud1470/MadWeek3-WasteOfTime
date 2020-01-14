@@ -7,6 +7,7 @@
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <application
         android:allowBackup="true"
@@ -16,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <activity android:name=".WakeupCloseActivity" />
         <activity
             android:name=".SplashActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -25,18 +27,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".WakeupActivity"
+            android:name=".WakeupExtendActivity"
             android:noHistory="true" />
         <activity
             android:name=".SetAlarmActivity"
+            android:noHistory="true" />
+        <activity
+            android:name=".CoolTimeActivity"
             android:noHistory="true" />
 
         <service
             android:name=".AlarmService"
             android:stopWithTask="false" />
-
+        <service
+            android:name=".CoolTimeService"
+            android:stopWithTask="false" />
         <service
             android:name=".GetForegroundService"
             android:stopWithTask="false" />
@@ -44,7 +50,6 @@
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".InfoActivity"
             android:theme="@style/AppTheme.NoActionBar" />

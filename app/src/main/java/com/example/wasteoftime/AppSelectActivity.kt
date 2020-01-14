@@ -57,6 +57,9 @@ class AppSelectActivity: AppCompatActivity(){
                 if (packageManager.getApplicationIcon(it) != null) {
                     item.setIcon(packageManager.getApplicationIcon(it))
                 }
+                if(appOptHolder.get_blocked_apps()?.contains(it.processName)!!){
+                    item.setIsChecked(true)
+                }
                 appList.add(item)
             }
         }

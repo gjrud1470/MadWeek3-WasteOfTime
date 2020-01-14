@@ -1,7 +1,9 @@
 package com.example.wasteoftime
 
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.edittext.view.*
@@ -46,7 +48,6 @@ class SettingActivity: AppCompatActivity(){
             val dialogView = layoutInflater.inflate(R.layout.edittext, null)
             val editTime = dialogView.editTime
             editTime.setHint("  ".plus(appOptHolder.get_cooltime().toString().plus("분, 숫자만 입력하세요")))
-            //TODO(현재 cooltime이 이상하게 표시됨 integer to long casting 탓으로 추측)
 
             val builder = AlertDialog.Builder(this)
             builder.setTitle("쿨타임을 입력하세요")
@@ -64,7 +65,6 @@ class SettingActivity: AppCompatActivity(){
             val dialogView = layoutInflater.inflate(R.layout.edittext, null)
             val editTime = dialogView.editTime
             editTime.setHint("  ".plus(appOptHolder.get_alarmtime().toString().plus("분, 숫자만 입력하세요")))
-            //TODO(현재 cooltime이 이상하게 표시됨 integer to long casting 탓으로 추측)
 
             val builder = AlertDialog.Builder(this)
             builder.setTitle("알람 시간을 입력하세요")
@@ -78,5 +78,29 @@ class SettingActivity: AppCompatActivity(){
                 .setNegativeButton("취소", null)
                 .show()
         }
+    }
+
+    override fun onResume() {
+        var list_str = ""
+        appOptHolder.get_blocked_apps()?.forEach {
+            list_str = list_str.plus(getAppName(it).plus(", "))
+        }
+        if (list_str.length > 3)
+            tracked_apps.text = list_str.substring(0, list_str.length-2)
+        apps_to_monitor.invalidate()
+
+        super.onResume()
+    }
+    private fun getAppName(packageName: String): String{
+        val pm = packageManager
+        val ai: ApplicationInfo?
+        ai = try {
+            pm.getApplicationInfo(packageName, 0)
+        } catch (e: java.lang.Exception) {
+            null
+        }
+        val applicationName =
+            (if (ai != null) pm.getApplicationLabel(ai) else packageName.substring(packageName.lastIndexOf('.') + 1)) as String
+        return applicationName
     }
 }

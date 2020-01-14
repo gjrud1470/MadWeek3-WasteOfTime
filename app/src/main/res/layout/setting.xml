@@ -94,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/nanumsquareround"
-                android:text="Youtube, 네이버 웹툰"
+                android:singleLine="true"
                 android:textSize="16dp" />
             <!-- text에 모니터링하는 어플 목록 띄워주기 -->
         </LinearLayout>
