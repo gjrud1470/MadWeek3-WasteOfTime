@@ -162,6 +162,7 @@ class GetForegroundService : Service() {
         }
     }
 
+    /*
     private class ScreenReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.i("Broadcast Listened", "Screen Toggled")
@@ -173,7 +174,7 @@ class GetForegroundService : Service() {
                 Log.i("[BroadcastReceiver]", "Screen OFF")
             }
         }
-    }
+    } */
 }
 /*
 class Restarter : BroadcastReceiver() {

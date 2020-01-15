@@ -21,7 +21,7 @@ class SplashActivity: AppCompatActivity(){
         // This method will be executed once the timer is over
         // Start your app main activity
         Handler().postDelayed({
-            if(true) { //checkAppFirstExecute()
+            if(true) { //checkAppFirstExecute() TODO("최초 실행을 구분할까?")
                 startActivity(Intent(this, InfoActivity::class.java))
             } else {
                 startActivity(Intent(this, MainActivity::class.java))

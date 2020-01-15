@@ -139,18 +139,18 @@ class MainActivity : AppCompatActivity() {
         appOptHolder.set_monitoring_flag(pref.getBoolean("monitoring_flag", true))
         appOptHolder.set_cooltime_bool(pref.getBoolean("cooltime_bool", true))
         appOptHolder.set_alarmtime(
-            pref.getLong(
+            pref.getInt(
                 "alarmtime",
-                resources.getInteger(R.integer.default_alarm_time).toLong()
+                resources.getInteger(R.integer.default_alarm_time)
                         * resources.getInteger(R.integer.min_unit)
-            )
+            ).toLong()
         )    // default 30 min
         appOptHolder.set_cooltime(
-            pref.getLong(
+            pref.getInt(
                 "cooltime",
-                resources.getInteger(R.integer.default_alarm_time).toLong()
+                resources.getInteger(R.integer.default_alarm_time)
                         * resources.getInteger(R.integer.min_unit)
-            )
+            ).toLong()
         )    // default 30 min
         appOptHolder.set_wakeup_opt(pref.getInt("wakeup_opt", 1))
 
