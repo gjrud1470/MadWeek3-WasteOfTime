@@ -14,7 +14,7 @@ import java.util.*
 
 class ExtendAlarmService : IntentService("ExtendAlarmService") {
 
-    var mNotificationManager : NotificationManagerCompat? = null
+    var mNotificationManager: NotificationManagerCompat? = null
 
     override fun onHandleIntent(intent: Intent?) {
         try {
@@ -32,28 +32,29 @@ class ExtendAlarmService : IntentService("ExtendAlarmService") {
                 Thread.sleep(alarmtime)
                 val foreground_Name = getForegroundName()
                 if (foreground_Name != null && appOptHolder.get_blocked_apps() != null
-                    && foreground_Name in appOptHolder.get_blocked_apps()!!) {
+                    && foreground_Name in appOptHolder.get_blocked_apps()!!
+                ) {
+                    val fullScreenPendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
                     if (appOptHolder.get_wakeup_opt() == 2) {
                         val builder = NotificationCompat.Builder(
                             applicationContext,
                             getString(R.string.channel_name_high)
                         )
-                            .setSmallIcon(R.drawable.arrow_right)
+                            .setSmallIcon(R.mipmap.waste_icon_foreground)
                             .setContentTitle("Waste of Time")
                             .setContentText("Time to stop Playing!")
-                            .setDefaults(Notification.DEFAULT_VIBRATE)
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setFullScreenIntent(fullScreenPendingIntent, true)
                             .setPriority(NotificationCompat.PRIORITY_HIGH)
                             .setAutoCancel(true)
                             .setTicker("Time to stop Playing!")
                             .build()
 
                         mNotificationManager?.notify(3, builder)
-                    }
-                    else if (appOptHolder.get_wakeup_opt() == 1) {
+                    } else if (appOptHolder.get_wakeup_opt() == 1) {
                         val wakeupintent = Intent(this, WakeupExtendActivity::class.java)
                         startActivity(wakeupintent)
-                    }
-                    else if (appOptHolder.get_wakeup_opt() == 0) {
+                    } else if (appOptHolder.get_wakeup_opt() == 0) {
                         val wakeupintent = Intent(this, WakeupCloseActivity::class.java)
                         startActivity(wakeupintent)
                     }
@@ -64,7 +65,7 @@ class ExtendAlarmService : IntentService("ExtendAlarmService") {
             else {
                 //appOptHolder.set_alarmtime(R.integer.default_alarm_time.toLong())
             }
-        }catch (e : InterruptedException) {
+        } catch (e: InterruptedException) {
             Thread.currentThread().interrupt()
         }
     }
@@ -83,7 +84,7 @@ class ExtendAlarmService : IntentService("ExtendAlarmService") {
         startForeground(2, builder.build())
     }
 
-    private fun getForegroundName() : String? {
+    private fun getForegroundName(): String? {
         return if (Build.VERSION.SDK_INT >= 21) {
             var currentApp: String? = null
             val usm =
@@ -118,9 +119,10 @@ class ExtendAlarmService : IntentService("ExtendAlarmService") {
             val name = getString(R.string.channel_name_high)
             val descriptionText = getString(R.string.channel_description)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(getString(R.string.channel_name_high), name, importance).apply {
-                description = descriptionText
-            }
+            val channel =
+                NotificationChannel(getString(R.string.channel_name_high), name, importance).apply {
+                    description = descriptionText
+                }
             // Register the channel with the system
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

@@ -6,11 +6,13 @@ import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.os.Bundle
-import android.preference.PreferenceManager
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.edittext.*
 import kotlinx.android.synthetic.main.edittext.view.*
 import kotlinx.android.synthetic.main.setting.*
+import kotlinx.android.synthetic.main.wakeup_extend.*
 import org.json.JSONArray
 
 
@@ -72,18 +74,22 @@ class SettingActivity: AppCompatActivity(){
 
         cooltime_time.setOnClickListener {
             val dialogView = layoutInflater.inflate(R.layout.edittext, null)
-            val editTime = dialogView.editTime
-            editTime.setHint("  ".plus((appOptHolder.get_cooltime()/60000).toString().plus("분, 숫자만 입력하세요")))
+            val timeSpinner = dialogView.time_spinner
+            val items = resources.getStringArray(R.array.time_array)
+            val myAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, items)
+            timeSpinner.adapter = myAdapter
 
             val builder = AlertDialog.Builder(this)
-            builder.setTitle("쿨타임을 입력하세요")
+            builder.setTitle("쿨타임을 선택하세요")
                 .setView(dialogView)
                 .setPositiveButton("확인"){_, _ ->
-                    if(!editTime.text.isBlank()){
-                        appOptHolder.set_cooltime(editTime.text.toString().toLong() * 60000)    // ms로 변환
-                        editor.putInt("cooltime", editTime.text.toString().toInt() * 60000) // ms로 변환
+                    if(!timeSpinner.isSelected){
+                        var selected = timeSpinner.selectedItem.toString()
+                        current_cooltime_time.text = selected
+                        selected = selected.substring(0,selected.length-3)
+                        appOptHolder.set_cooltime(selected.toLong() * 100)    // ms로 변환
+                        editor.putInt("cooltime", selected.toInt() * 100) // ms로 변환
                         editor.apply()
-                        current_cooltime_time.text = editTime.text.toString().plus("분")
                     }
                 }
                 .setNegativeButton("취소", null)
@@ -91,18 +97,22 @@ class SettingActivity: AppCompatActivity(){
         }
         alarm_time.setOnClickListener {
             val dialogView = layoutInflater.inflate(R.layout.edittext, null)
-            val editTime = dialogView.editTime
-            editTime.setHint("  ".plus((appOptHolder.get_alarmtime()/60000).toString().plus("분, 숫자만 입력하세요")))
+            val timeSpinner = dialogView.time_spinner
+            val items = resources.getStringArray(R.array.time_array)
+            val myAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, items)
+            timeSpinner.adapter = myAdapter
 
             val builder = AlertDialog.Builder(this)
-            builder.setTitle("알람 시간을 입력하세요")
+            builder.setTitle("알람 시간을 선택하세요")
                 .setView(dialogView)
                 .setPositiveButton("확인"){_, _ ->
-                    if(!editTime.text.isBlank()){
-                        appOptHolder.set_alarmtime(editTime.text.toString().toLong() * 60000)   //ms로 변환
-                        editor.putInt("alarmtime", editTime.text.toString().toInt() * 60000) // ms로 변환
+                    if(!timeSpinner.isSelected){
+                        var selected = timeSpinner.selectedItem.toString()
+                        current_alarm_time.text = selected
+                        selected = selected.substring(0,selected.length-3)
+                        appOptHolder.set_alarmtime(selected.toLong() * 100)   //ms로 변환
+                        editor.putInt("alarmtime", selected.toInt() * 100) // ms로 변환
                         editor.apply()
-                        current_alarm_time.text = editTime.text.toString().plus("분")
                     }
                 }
                 .setNegativeButton("취소", null)

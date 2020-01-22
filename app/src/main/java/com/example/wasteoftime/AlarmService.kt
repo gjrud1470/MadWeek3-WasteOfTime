@@ -34,15 +34,17 @@ class AlarmService : IntentService("AlarmService") {
                 if (foreground_Name != null && appOptHolder.get_blocked_apps() != null
                     && foreground_Name in appOptHolder.get_blocked_apps()!!
                 ) {
+                    val fullScreenPendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
                     if (appOptHolder.get_wakeup_opt() == 2) {
                         val builder = NotificationCompat.Builder(
                             applicationContext,
                             getString(R.string.channel_name_high)
                         )
-                            .setSmallIcon(R.drawable.arrow_right)
+                            .setSmallIcon(R.mipmap.waste_icon_foreground)
                             .setContentTitle("Waste of Time")
                             .setContentText("Time to stop Playing!")
-                            .setDefaults(Notification.DEFAULT_VIBRATE)
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setFullScreenIntent(fullScreenPendingIntent, true)
                             .setPriority(NotificationCompat.PRIORITY_HIGH)
                             .setAutoCancel(true)
                             .setTicker("Time to stop Playing!")
